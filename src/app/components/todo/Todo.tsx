@@ -14,6 +14,7 @@ const Todo = () => {
         setTodoList([...todoList, todo])
         setTodo("");
     }
+    
     // 할 일 삭제 함수
     const deleteTodo = (index: number) => {
         const confirm = window.confirm("정말 삭제하시겠습니까?");
