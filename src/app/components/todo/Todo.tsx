@@ -1,5 +1,5 @@
 "use client"
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const Todo = () => {
     type TodoItem = {
@@ -20,61 +20,74 @@ const Todo = () => {
 
     // 할 일 추가 함수
     const addTodo = () => {
-        if(todo.trim() === ""){
+        if (todo.trim() === "") {
             alert("할 일을 입력해주세요");
             return; // Input이 비어있으면 추가하지 않음
         }
-        setTodoList([...todoList, {text: todo, isDone: false}])
+        setTodoList([...todoList, { text: todo, isDone: false }])
         setTodo("");
     }
-    
+
     // 할 일 삭제 함수
     const deleteTodo = (index: number) => {
         const confirm = window.confirm("정말 삭제하시겠습니까?");
-        if(confirm){
+        if (confirm) {
             setTodoList(todoList.filter((_, i) => i !== index))
         }
     }
-    
+
     // 체크박스 토글 함수
     const toggleCheckbox = (index: number) => {
-        setTodoList(todoList.map((item, i) => 
+        setTodoList(todoList.map((item, i) =>
             i === index ? { ...item, isDone: !item.isDone } : item
         ));
     }
-    
-    return(
-        <div className="flex flex-col items-center justify-center">
-            <header className="text-2xl font-bold border-2">나만의 Todo List
-                <div className="flex flex-col items-center justify-center">
-                    <h1>{now.toLocaleDateString()}</h1>
-                    <h1>{now.toLocaleTimeString()}</h1>
-                </div>
-            </header>
 
-            <div className="flex ">
-            <input 
-            type="text" 
-            placeholder="새로운 할 일 추가" 
-            className="border-2"
-            value={todo}
-            onChange={(e) => setTodo(e.target.value)}
-            />
-            <button className="border-2" onClick={addTodo}>추가하기</button>
+    return (
+        <div className="flex flex-col items-center min-h-screen py-10 px-4 bg-gray-100">
+            <h1 className="text-4xl font-bold mb-2">📝 Todo List</h1>
+            <h2 className="text-lg text-gray-600">{now.toLocaleDateString()}</h2>
+            <h2 className="text-sm text-gray-500 mb-6">{now.toLocaleTimeString()}</h2>
+
+            <div className="flex w-full max-w-xl mb-4 gap-2">
+                <input
+                    type="text"
+                    placeholder="할 일을 입력하세요"
+                    className="flex-1 border border-gray-300 rounded px-4 py-2 shadow-sm focus:outline-blue-400"
+                    style={{ cursor: "pointer" }}
+                    value={todo}
+                    onChange={(e) => setTodo(e.target.value)}
+                />
+                <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    onClick={addTodo}
+                >
+                    추가하기
+                </button>
             </div>
 
-            <div>
+            <div className="w-full max-w-xl">
                 {todoList.map((todo, index) => (
-                    <div key={index} className={`flex items-center`}>
-                        <input 
-                            type="checkbox" 
-                            checked={todo.isDone}
-                            onChange={() => toggleCheckbox(index)}
-                        />
-                        <span className={todo.isDone ? 'line-through text-gray-500' : ''}>
-                            {todo.text}
-                        </span>
-                        <button className="border-2" onClick={() => deleteTodo(index)}>삭제</button>
+                    <div
+                        key={index}
+                        className="flex justify-between items-center bg-white p-3 mb-2 rounded shadow"
+                    >
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="checkbox"
+                                checked={todo.isDone}
+                                onChange={() => toggleCheckbox(index)}
+                            />
+                            <span className={`text-lg ${todo.isDone ? 'line-through text-gray-400' : ''}`}>
+                                {todo.text}
+                            </span>
+                        </div>
+                        <button
+                            className="text-red-500 text-sm hover:underline"
+                            onClick={() => deleteTodo(index)}
+                        >
+                            삭제
+                        </button>
                     </div>
                 ))}
             </div>
