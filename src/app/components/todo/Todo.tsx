@@ -10,6 +10,7 @@ const Todo = () => {
     const [todo, setTodo] = useState("")
     const [todoList, setTodoList] = useState<TodoItem[]>([])
     const [now, setNow] = useState(new Date());
+    const [localisLoaded, setLocalIsLoaded] = useState(false);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -17,6 +18,23 @@ const Todo = () => {
         }, 1000);
         return () => clearInterval(timer);
     }, []);
+
+    // 로컬 스토리지 불러오기
+    useEffect(() => {
+        const savedTodoList = localStorage.getItem("todoList");
+        if (savedTodoList) {
+            setTodoList(JSON.parse(savedTodoList));
+        }
+        setLocalIsLoaded(true);
+    }, []);
+
+    // 할 일 목록 저장 (불러온 이후에만 저장하도록)
+    useEffect(() => {
+        if (localisLoaded) {
+            localStorage.setItem("todoList", JSON.stringify(todoList));
+            console.log("저장 완료:", todoList);
+        }
+    }, [todoList, localisLoaded]);
 
     // 할 일 추가 함수
     const addTodo = () => {
