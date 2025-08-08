@@ -1,4 +1,5 @@
 "use client"
+import { supabase } from "@/lib/supabase";
 import { useState, useEffect } from "react";
 
 const Todo = () => {
@@ -19,6 +20,22 @@ const Todo = () => {
         return () => clearInterval(timer);
     }, []);
 
+    // Supabase 데이터 불러오기
+    useEffect(() => {
+        const fetchData = async () => {
+          const { data, error } = await supabase
+            .from('User_Profile')  
+            .select('*')         
+    
+          if (error) {
+            console.error("데이터 불러오기 실패:", error)
+          } else {
+            console.log("불러온 데이터:", data)
+          }
+        }
+        fetchData()
+      }, [])
+
     // 로컬 스토리지 불러오기
     useEffect(() => {
         const savedTodoList = localStorage.getItem("todoList");
@@ -27,7 +44,7 @@ const Todo = () => {
         }
         setLocalIsLoaded(true);
     }, []);
-
+      
     // 할 일 목록 저장 (불러온 이후에만 저장하도록)
     useEffect(() => {
         if (localisLoaded) {
