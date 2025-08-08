@@ -1,3 +1,4 @@
+"use client"
 import Todo from "./components/todo/Todo";
 
 const Main = () => {
