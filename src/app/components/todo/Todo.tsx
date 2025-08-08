@@ -20,15 +20,6 @@ const Todo = () => {
         return () => clearInterval(timer);
     }, []);
 
-    // 로컬 스토리지 불러오기
-    useEffect(() => {
-        const savedTodoList = localStorage.getItem("todoList");
-        if (savedTodoList) {
-            setTodoList(JSON.parse(savedTodoList));
-        }
-        setLocalIsLoaded(true);
-    }, []);
-
     // Supabase 데이터 불러오기
     useEffect(() => {
         const fetchData = async () => {
@@ -44,6 +35,15 @@ const Todo = () => {
         }
         fetchData()
       }, [])
+
+    // 로컬 스토리지 불러오기
+    useEffect(() => {
+        const savedTodoList = localStorage.getItem("todoList");
+        if (savedTodoList) {
+            setTodoList(JSON.parse(savedTodoList));
+        }
+        setLocalIsLoaded(true);
+    }, []);
       
     // 할 일 목록 저장 (불러온 이후에만 저장하도록)
     useEffect(() => {
