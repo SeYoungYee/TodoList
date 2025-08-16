@@ -18,7 +18,7 @@ export default function LoginPage() {
 
     const data = await res.json();
     setMessage(res.ok ? "로그인 성공!" : `로그인 실패: ${data.error}`);
-    console.log(data);
+    console.log('로그인된 데이터!!',data.user.user.user_metadata.email);
   };
 
   return (
