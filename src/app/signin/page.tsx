@@ -1,24 +1,32 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = await fetch("/api/auth/signin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
 
-    const data = await res.json();
-    setMessage(res.ok ? "로그인 성공!" : `로그인 실패: ${data.error}`);
-    console.log('로그인된 데이터!!',data.user.user.user_metadata.email);
+    if (error) {
+      setMessage(`로그인 실패: ${error.message}`);
+      return;
+    }
+    // 로그인 성공 시 세션 확인
+    const session = data.session;
+    console.log("로그인된 세션:", session);
+    setMessage("로그인 성공!");
+    router.push("/");
   };
 
   return (
