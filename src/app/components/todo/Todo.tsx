@@ -81,7 +81,7 @@ const Todo = () => {
             <h1 className="text-4xl font-bold mb-2">📝 Todo List</h1>
             <h2 className="text-lg text-gray-600">{now.toLocaleDateString()}</h2>
             <h2 className="text-sm text-gray-500 mb-6">{now.toLocaleTimeString()}</h2>
-            <h2>로그인 된 이메일: {user.email}</h2>
+            {/* <h2>로그인 된 이메일: {user.email}</h2> */}
             <div className="flex w-full max-w-xl mb-4 gap-2">
                 <input
                     type="text"

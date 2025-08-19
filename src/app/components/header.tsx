@@ -2,16 +2,26 @@
 
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const router = useRouter();
+  const [loginUser, setLoginUser] = useState<any>("");
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setLoginUser(data.user);
+    };
+    fetchUser();
+  }, []);
 
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
       alert("로그아웃 성공");
       console.log("로그아웃 성공");
-      router.push("/login"); 
+      router.push("/signin"); 
     } catch (error) {
       console.error("로그아웃 실패:", error);
       alert("로그아웃 실패");
@@ -26,6 +36,7 @@ export default function Header() {
       >
         로그아웃
       </button>
+      <h1>로그인된 아이디: {loginUser?.email}</h1>
     </header>
   );
 }
