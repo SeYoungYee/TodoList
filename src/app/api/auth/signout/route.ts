@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/server";
 
-export async function POST(req: Request) {
-  try {
-    const { error } = await supabase.auth.signOut();
+export async function POST() {
+  const supabase = createClient();
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
-    }
+  const { error } = await supabase.auth.signOut();
 
-    return NextResponse.json({ message: "로그아웃 성공" });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "로그아웃 실패" }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
+
+  return NextResponse.json({ message: "로그아웃 성공" });
 }
