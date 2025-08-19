@@ -1,5 +1,6 @@
 "use client"
 import { supabase } from "@/lib/supabase";
+import Router from "next/router";
 import { useState, useEffect } from "react";
 
 const Todo = () => {
@@ -12,6 +13,7 @@ const Todo = () => {
     const [todoList, setTodoList] = useState<TodoItem[]>([])
     const [now, setNow] = useState(new Date());
     const [localisLoaded, setLocalIsLoaded] = useState(false);
+    const [user,setUser] = useState<any>("");
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -62,12 +64,24 @@ const Todo = () => {
         ));
     }
 
+    useEffect(() => {
+        const fetchUser = async () => {
+            const { data, error } = await supabase.auth.getUser();
+            if (error || !data.user) {
+                Router.push("/signin"); // 로그인 안 했으면 로그인 페이지로
+            } else {
+                setUser(data.user);
+            }
+        };
+        fetchUser();
+    }, []);
+
     return (
         <div className="flex flex-col items-center min-h-screen py-10 px-4 bg-gray-100">
             <h1 className="text-4xl font-bold mb-2">📝 Todo List</h1>
             <h2 className="text-lg text-gray-600">{now.toLocaleDateString()}</h2>
             <h2 className="text-sm text-gray-500 mb-6">{now.toLocaleTimeString()}</h2>
-
+            <h2>로그인 된 이메일: {user.email}</h2>
             <div className="flex w-full max-w-xl mb-4 gap-2">
                 <input
                     type="text"
