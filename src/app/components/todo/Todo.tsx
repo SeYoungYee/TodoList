@@ -1,5 +1,7 @@
 "use client"
 import { supabase } from "@/lib/supabase";
+import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import Router from "next/router";
 import { useState, useEffect } from "react";
 
@@ -75,6 +77,10 @@ const Todo = () => {
         };
         fetchUser();
     }, []);
+
+    const insertTodo = () =>{
+        
+    }
 
     return (
         <div className="flex flex-col items-center min-h-screen py-10 px-4 bg-gray-100">
