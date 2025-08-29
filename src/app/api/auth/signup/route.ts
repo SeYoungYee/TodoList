@@ -1,5 +1,6 @@
+import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
+
 
 export async function POST(req: Request) {
   try {
@@ -20,6 +21,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     console.log("회원가입 완료", data.user);
+    const user = data.user
+
+    const { error: insertError } = await supabase.from("user_info").insert([
+      { id: user?.id, email, nickname }
+    ]);
+    if(insertError)(
+      console.error("오류발생",insertError)
+    )
+
     return NextResponse.json({ user: data.user });
   } catch (error) { //try catch에서 발생한 에러구문
     console.error(error);
