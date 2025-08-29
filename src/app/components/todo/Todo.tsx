@@ -2,7 +2,7 @@
 import { supabase } from "@/lib/supabase";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
-import Router from "next/router";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const Todo = () => {
@@ -16,6 +16,7 @@ const Todo = () => {
     const [now, setNow] = useState(new Date());
     const [localisLoaded, setLocalIsLoaded] = useState(false);
     const [user,setUser] = useState<any>("");
+    const router = useRouter();
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -70,7 +71,7 @@ const Todo = () => {
         const fetchUser = async () => {
             const { data, error } = await supabase.auth.getUser();
             if (error || !data.user) {
-                Router.push("/signin"); // 로그인 안 했으면 로그인 페이지로
+                router.push("/signin"); // 로그인 안 했으면 로그인 페이지로
             } else {
                 setUser(data.user);
             }
