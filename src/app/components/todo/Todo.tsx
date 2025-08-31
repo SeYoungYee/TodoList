@@ -51,6 +51,14 @@ const Todo = () => {
         setTodoList([...todoList, { text: todo, isDone: false }])
         setTodo("");
     }
+    
+    // supbase 할 일 추가 함수
+    const supabaseAddTodo = async () =>{
+        const { data, error } = await supabase
+        .from("todos")
+        .insert([{ user_id: user.id, contents: todo, is_done: false }])
+        .select();
+    }
 
     // 할 일 삭제 함수
     const deleteTodo = (index: number) => {
@@ -100,7 +108,7 @@ const Todo = () => {
                 />
                 <button
                     className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                    onClick={addTodo}
+                    onClick={supabaseAddTodo}
                 >
                     추가하기
                 </button>
