@@ -7,6 +7,11 @@ import { useState, useEffect } from "react";
 
 const Todo = () => {
     type TodoItem = {
+        id: number;
+        contents: string;
+        is_done: boolean;
+        user_id: string;
+        created_at: string;
         text: string;
         isDone: boolean;
     }
@@ -14,8 +19,7 @@ const Todo = () => {
     const [todo, setTodo] = useState("")
     const [todoList, setTodoList] = useState<TodoItem[]>([])
     const [now, setNow] = useState(new Date());
-    const [localisLoaded, setLocalIsLoaded] = useState(false);
-    const [user,setUser] = useState<any>("");
+    const [user, setUser] = useState<any>("");
     const router = useRouter();
 
     useEffect(() => {
@@ -25,39 +29,50 @@ const Todo = () => {
         return () => clearInterval(timer);
     }, []);
 
-    // 로컬 스토리지 불러오기
+    // 로그인된 유저 가져오기
     useEffect(() => {
-        const savedTodoList = localStorage.getItem("todoList");
-        if (savedTodoList) {
-            setTodoList(JSON.parse(savedTodoList));
-        }
-        setLocalIsLoaded(true);
+        const fetchUser = async () => {
+            const {
+                data: { user },
+                error,
+            } = await supabase.auth.getUser();
+            if (error || !user) {
+                router.push("/signin"); // 로그인 안 했으면 로그인 페이지로
+            } else {
+                setUser(user);
+                fetchTodos(user.id); // 유저 있으면 바로 todo 불러오기
+            }
+        };
+        fetchUser();
     }, []);
-      
-    // 할 일 목록 저장 (불러온 이후에만 저장하도록)
-    useEffect(() => {
-        if (localisLoaded) {
-            localStorage.setItem("todoList", JSON.stringify(todoList));
-            console.log("저장 완료:", todoList);
-        }
-    }, [todoList, localisLoaded]);
 
-    // 할 일 추가 함수
-    const addTodo = () => {
-        if (todo.trim() === "") {
-            alert("할 일을 입력해주세요");
-            return; // Input이 비어있으면 추가하지 않음
-        }
-        setTodoList([...todoList, { text: todo, isDone: false }])
-        setTodo("");
-    }
-    
-    // supbase 할 일 추가 함수
-    const supabaseAddTodo = async () =>{
+    // DB에서 todo 불러오기
+    const fetchTodos = async (userId: string) => {
         const { data, error } = await supabase
-        .from("todos")
-        .insert([{ user_id: user.id, contents: todo, is_done: false }])
-        .select();
+            .from("todos")
+            .select("*")
+            .eq("user_id", userId)
+            .order("created_at", { ascending: false });
+
+        if (error) {
+            console.error("Todo 불러오기 실패:", error.message);
+        } else {
+            setTodoList(data || []);
+        }
+    };
+
+    // supbase 할 일 추가 함수
+    const supabaseAddTodo = async () => {
+        const { data, error } = await supabase
+            .from("todos")
+            .insert([{ user_id: user.id, contents: todo, is_done: false }])
+            .select();
+        if(error) {
+            console.log("데이터 추가 실패",error.message);
+        }else {
+            setTodo("");
+            fetchTodos(user.id);
+        }
     }
 
     // 할 일 삭제 함수
@@ -86,10 +101,6 @@ const Todo = () => {
         };
         fetchUser();
     }, []);
-
-    const insertTodo = () =>{
-        
-    }
 
     return (
         <div className="flex flex-col items-center min-h-screen py-10 px-4 bg-gray-100">
@@ -123,11 +134,11 @@ const Todo = () => {
                         <div className="flex items-center gap-3">
                             <input
                                 type="checkbox"
-                                checked={todo.isDone}
+                                checked={todo.is_done}
                                 onChange={() => toggleCheckbox(index)}
                             />
                             <span className={`text-lg ${todo.isDone ? 'line-through text-gray-400' : ''}`}>
-                                {todo.text}
+                                {todo.contents}
                             </span>
                         </div>
                         <button
