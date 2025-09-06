@@ -75,6 +75,24 @@ const Todo = () => {
         }
     }
 
+    // supabase 할 일 삭제 함수
+    const supabaseDeleteTodo = async (id: number) => {
+        const confirm = window.confirm("정말 삭제하시겠습니까?");
+        if (confirm) {
+        const { data, error } = await supabase
+            .from("todos")
+            .delete()
+            .eq("id", id);
+            if(error) {
+                console.log("데이터 삭제 실패", error.message);
+            }else {
+                fetchTodos(user.id);
+            }   
+        } else{
+            return;
+        }
+    }
+
     // 할 일 삭제 함수
     const deleteTodo = (index: number) => {
         const confirm = window.confirm("정말 삭제하시겠습니까?");
@@ -143,7 +161,7 @@ const Todo = () => {
                         </div>
                         <button
                             className="text-red-500 text-sm hover:underline"
-                            onClick={() => deleteTodo(index)}
+                            onClick={() => supabaseDeleteTodo(todo.id)}
                         >
                             삭제
                         </button>
