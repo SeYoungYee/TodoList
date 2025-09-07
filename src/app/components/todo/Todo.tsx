@@ -21,6 +21,8 @@ const Todo = () => {
     const [now, setNow] = useState(new Date());
     const [user, setUser] = useState<any>("");
     const router = useRouter();
+    const [editId, setEditId] = useState<number | null>(null)
+    const [editValue, setEditValue] = useState("")
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -93,12 +95,38 @@ const Todo = () => {
         }
     }
 
-    // 할 일 삭제 함수
-    const deleteTodo = (index: number) => {
-        const confirm = window.confirm("정말 삭제하시겠습니까?");
-        if (confirm) {
-            setTodoList(todoList.filter((_, i) => i !== index))
+    // supabase 할 일 수정 함수
+    const supabaseUpdateTodo = async (id: number, contents: string) => {
+        const { data, error } = await supabase
+            .from("todos")
+            .update({ contents })
+            .eq("id", id)
+            .select();
+        if (error) {
+            console.error("데이터 수정 실패", error.message);
+        } else {
+            await fetchTodos(user.id);
         }
+    }
+
+    const startEdit = (id: number, value: string) => {
+        setEditId(id);
+        setEditValue(value);
+    }
+
+    const cancelEdit = () => {
+        setEditId(null);
+        setEditValue("");
+    }
+
+    const saveEdit = async (id: number) => {
+        const trimmed = editValue.trim();
+        if (!trimmed) {
+            cancelEdit();
+            return;
+        }
+        await supabaseUpdateTodo(id, trimmed);
+        cancelEdit();
     }
 
     // 체크박스 토글 함수
@@ -146,7 +174,7 @@ const Todo = () => {
             <div className="w-full max-w-xl">
                 {todoList.map((todo, index) => (
                     <div
-                        key={index}
+                        key={todo.id ?? index}
                         className="flex justify-between items-center bg-white p-3 mb-2 rounded shadow"
                     >
                         <div className="flex items-center gap-3">
@@ -155,16 +183,51 @@ const Todo = () => {
                                 checked={todo.is_done}
                                 onChange={() => toggleCheckbox(index)}
                             />
-                            <span className={`text-lg ${todo.isDone ? 'line-through text-gray-400' : ''}`}>
-                                {todo.contents}
-                            </span>
+                            {editId === todo.id ? (
+                                <input
+                                    autoFocus
+                                    className="text-lg border border-gray-300 rounded px-2 py-1"
+                                    value={editValue}
+                                    onChange={(e) => setEditValue(e.target.value)}
+                                    onBlur={() => saveEdit(todo.id)}
+                                />
+                            ) : (
+                                <span className={`text-lg ${todo.isDone ? 'line-through text-gray-400' : ''}`}>
+                                    {todo.contents}
+                                </span>
+                            )}
                         </div>
+                        <div className="flex items-center gap-6">
+                        {editId === todo.id ? (
+                            <div className="flex items-center gap-3">
+                                <button
+                                    className="text-green-600 text-sm hover:underline"
+                                    onClick={() => saveEdit(todo.id)}
+                                >
+                                    저장
+                                </button>
+                                <button
+                                    className="text-gray-500 text-sm hover:underline"
+                                    onClick={cancelEdit}
+                                >
+                                    취소
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                className="text-blue-500 text-sm hover:underline"
+                                onClick={() => startEdit(todo.id, todo.contents)}
+                            >
+                                수정
+                            </button>
+                        )}
                         <button
                             className="text-red-500 text-sm hover:underline"
                             onClick={() => supabaseDeleteTodo(todo.id)}
                         >
                             삭제
                         </button>
+                        </div>
                     </div>
                 ))}
             </div>
