@@ -129,12 +129,22 @@ const Todo = () => {
         cancelEdit();
     }
 
-    // 체크박스 토글 함수
-    const toggleCheckbox = (index: number) => {
-        setTodoList(todoList.map((item, i) =>
-            i === index ? { ...item, isDone: !item.isDone } : item
-        ));
+    // supabase 체크박스 함수 (true, false)
+    const toggleCheckbox = async (id: number, is_done: boolean) => {
+        const { data, error } = await supabase
+      .from("todos")
+      .update({ is_done: !is_done })
+      .eq("id", id)
+      .select();
+  
+    if (error) {
+      console.error("체크박스 오류", error.message);
+    } else {
+      setTodoList(todoList.map((item) =>
+        item.id === id ? { ...item, is_done: !is_done } : item
+      ));
     }
+  };
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -181,7 +191,7 @@ const Todo = () => {
                             <input
                                 type="checkbox"
                                 checked={todo.is_done}
-                                onChange={() => toggleCheckbox(index)}
+                                onChange={() => toggleCheckbox(todo.id, todo.is_done)}
                             />
                             {editId === todo.id ? (
                                 <input
