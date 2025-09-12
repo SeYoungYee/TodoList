@@ -36,7 +36,13 @@ export default function Header() {
       >
         로그아웃
       </button>
-      <h1>로그인된 아이디: {loginUser?.email}</h1>
+      {/* <h1>로그인된 아이디: {loginUser?.email}</h1> */}
+      <button
+        onClick={() => router.push("/mypage")}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        마이페이지
+      </button>
     </header>
   );
 }
