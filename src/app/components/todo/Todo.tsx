@@ -202,7 +202,7 @@ const Todo = () => {
                                     onBlur={() => saveEdit(todo.id)}
                                 />
                             ) : (
-                                <span className={`text-lg ${todo.isDone ? 'line-through text-gray-400' : ''}`}>
+                                <span className={`text-lg ${todo.is_done ? 'line-through text-gray-400' : ''}`}>
                                     {todo.contents}
                                 </span>
                             )}
