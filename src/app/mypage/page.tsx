@@ -9,6 +9,8 @@ const MyPage = () => {
     const [userInfo, setUserInfo] = useState<any>(null);
     const [now, setNow] = useState(new Date());
     const [isUploading, setIsUploading] = useState(false);
+    const [EditingNickname, setEditingNickname] = useState(false);
+    const [newNickname, setNewNickname] = useState("");
     const router = useRouter();
 
     useEffect(() => {
@@ -149,6 +151,40 @@ const MyPage = () => {
         }
     };
 
+    // 닉네임 수정 
+    const startNicknameEdit = () => {
+        setNewNickname(userInfo?.nickname || "");
+        setEditingNickname(true);
+    };
+
+    // 닉네임 수정 취소
+    const cancelNicknameEdit = () => {
+        setEditingNickname(false);
+        setNewNickname("");
+    };
+
+    // 닉네임 저장
+    const saveNickname = async () => {
+        if (!newNickname.trim()) {
+            alert("닉네임을 입력해주세요.");
+            return;
+        }
+
+        const { error } = await supabase
+            .from("user_info")
+            .update({ nickname: newNickname.trim() })
+            .eq("id", loginUser.id);
+
+        if (error) {
+            alert("닉네임 변경 실패");
+        } else {
+            alert("닉네임 변경 완료");
+            setUserInfo({ ...userInfo, nickname: newNickname.trim() });
+            setEditingNickname(false);
+            setNewNickname("");
+        }
+    };
+
     return (
         <div className="flex flex-col items-center min-h-screen py-10 px-4 bg-gray-100">
             <h1 className="text-4xl font-bold mb-2">👤 마이페이지</h1>
@@ -204,7 +240,41 @@ const MyPage = () => {
                         </div>
                         <div className="flex justify-between items-center py-2 border-b border-gray-200">
                             <span className="text-gray-600 font-medium">닉네임:</span>
-                            <span className="text-gray-800">{userInfo?.nickname || "설정되지 않음"}</span>
+                            {EditingNickname ? (
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="text"
+                                        value={newNickname}
+                                        onChange={(e) => setNewNickname(e.target.value)}
+                                        className="border border-gray-300 rounded px-2 py-1 text-gray-800 focus:outline-blue-400"
+                                        placeholder="새 닉네임을 입력하세요"
+                                        maxLength={20}
+                                        autoFocus
+                                    />
+                                    <button
+                                        className="bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600"
+                                        onClick={saveNickname}
+                                    >
+                                        저장
+                                    </button>
+                                    <button
+                                        className="bg-gray-500 text-white px-2 py-1 rounded text-sm hover:bg-gray-600"
+                                        onClick={cancelNicknameEdit}
+                                    >
+                                        취소
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <span className="text-gray-800">{userInfo?.nickname || "설정되지 않음"}</span>
+                                    <button
+                                        className="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600"
+                                        onClick={startNicknameEdit}
+                                    >
+                                        편집
+                                    </button>
+                                </div>
+                            )}
                         </div>
                         <div className="flex justify-between items-center py-2">
                             <span className="text-gray-600 font-medium">가입일:</span>
